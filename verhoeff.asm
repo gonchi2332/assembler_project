@@ -39,7 +39,6 @@ global main
 main:
     mov rbp, rsp; for correct debugging
     mov ebp, esp; for correct debugging
-    mov rbp, rsp; for correct debugging
     sub rsp, 40           
     lea rsi, [rel ejemplo]
     call verhoeff
@@ -48,6 +47,7 @@ main:
     mov [rel salida], al
 
     ; HANDLE hOut = GetStdHandle(-11)
+    
     mov ecx, -11
     call GetStdHandle
     mov rcx, rax                ; primer parámetro: handle

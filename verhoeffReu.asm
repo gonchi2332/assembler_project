@@ -48,20 +48,20 @@ verhoeff:
     xor rcx, rcx
     xor rax, rax
 
-.find_end:
+.fin_cad:
     mov al, [rsi + rcx]
     cmp al, 0
-    je .start
+    je .inicio
     inc rcx
-    jmp .find_end
+    jmp .fin_cad
 
-.start:
+.inicio:
     dec rcx
     xor r9, r9
     dec r9
 .loop:
     cmp r9, rcx
-    jge .done
+    jge .termino
 
     movzx rax, byte [rsi + rcx]
     sub rax, '0'
@@ -81,7 +81,7 @@ verhoeff:
     dec rcx
     jmp .loop
 
-.done:
+.termino:
     movzx rax, byte [r12 + rbx]
     ; Resultado final en AL
 
