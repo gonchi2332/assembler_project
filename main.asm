@@ -18,6 +18,8 @@ section .data
     sum_dig times 18 db 0
     resultado db 0         ; aquí guardaremos AL como ASCII
     escrito dq 0
+    handle_stdout dq 0
+    mensaje db "Resultado final", 10, 0
 
 section .bss
     cinco_verhoeff resb 5
@@ -29,6 +31,11 @@ section .bss
 section .text
 global main
 main:
+    mov rbp, rsp; for correct debugging
+    mov rcx, -11
+    call GetStdHandle
+    mov [handle_stdout], rax
+    
     mov rbp, rsp ; debug
     sub rsp, 40    
     xor r13, r13
@@ -147,4 +154,29 @@ main:
         jl .particionar_loop
 
     xor ecx, ecx
-    call ExitProcess    
+    call ExitProcess  
+
+      
+            
+;imprimir resultados
+imprimir_string:
+    ; rsi debe apuntar a la cadena que quieres imprimir
+    ; rdx debe contener la longitud de la cadena
+    push rcx
+    push rdx
+    push r8
+    push r9
+
+    mov rcx, [handle_stdout]
+    mov r8, rdx               ; Número de bytes a escribir
+    lea r9, [escrito]         ; Dirección para almacenar bytes escritos
+    xor rax, rax              ; LPOVERLAPPED = NULL
+    push rax                  ; Empujamos NULL al stack
+    call WriteFile
+    add rsp, 8                ; Limpiamos el parámetro en stack
+
+    pop r9
+    pop r8
+    pop rdx
+    pop rcx
+    ret    
