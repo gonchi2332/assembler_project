@@ -4,7 +4,7 @@ global tamcad
 ; Entradas:
 ;   RSI -> puntero a cadena ASCII
 ; Salida:
-;   rcx  <- tamaño de la cadena
+;   rcx  <- tamano de la cadena
 
 tamcad:
     mov rbp, rsp; for correct debugging

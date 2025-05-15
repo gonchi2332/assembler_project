@@ -4,6 +4,7 @@
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\int_a_cad.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\llaveDos.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\rc4Reu.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\hex_a_ascii.asm"
 
 extern GetStdHandle
 extern WriteFile
@@ -28,6 +29,7 @@ section .bss
     inc_cinco_verhoeff resb 5
     cad_concatenada    resb 116
     cypher1 resb 116
+    cad_cypher1 resb 233
     sum1 resb 1
     sum2 resb 1
     sum3 resb 1
@@ -129,21 +131,25 @@ main:
     lea rsi, [numero_factura]
     call tamcad
     mov r8, rcx
+    lea rsi, [cad_concatenada]
     lea rdi, [numero_factura] 
     call concatenar_cad
     lea rsi, [nit_cliente]
     call tamcad
     mov r8, rcx
+    lea rsi, [cad_concatenada]
     lea rdi, [nit_cliente] 
     call concatenar_cad
     lea rsi, [fecha_transaccion]
     call tamcad
     mov r8, rcx
+    lea rsi, [cad_concatenada]
     lea rdi, [fecha_transaccion] 
     call concatenar_cad
     lea rsi, [monto_transaccion]
     call tamcad
     mov r8, rcx
+    lea rsi, [cad_concatenada]
     lea rdi, [monto_transaccion] 
     call concatenar_cad
     
@@ -158,6 +164,13 @@ main:
     lea rdi, [cypher1]  
     call encripcion_rc4
 
+    ; Llamamos a tamcad porque da el tamano de cad_concatenada, que es igual que cypher1
+    call tamcad
+    lea rsi, [cypher1]
+    lea rdi, [cad_cypher1]
+    xor r11, r11
+    call hex_a_ascii
+    
     xor rcx, rcx
     call ExitProcess  
 
