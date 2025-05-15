@@ -184,6 +184,7 @@ main:
 
     ; Llamamos a tamcad porque da el tamano de cad_concatenada, que es igual que cypher1
     call tamcad
+    xor r13, r13
     lea rsi, [cypher1]
     lea rdi, [cad_cypher1]
     xor r11, r11
@@ -194,23 +195,24 @@ main:
     call tamcad
     call sum_hex
     mov [sum1], r10
-    add [sum_total], r10
+    add r13, r10
     inc rax
     call sum_hex 
     mov [sum2], r10
-    add [sum_total], r10
+    add r13, r10
     inc rax
     call sum_hex 
     mov [sum3], r10
-    add [sum_total], r10
+    add r13, r10
     inc rax
     call sum_hex 
     mov [sum4], r10
-    add [sum_total], r10
+    add r13, r10
     inc rax
     call sum_hex 
     mov [sum5], r10
-    add [sum_total], r10
+    add r13, r10
+    mov [sum_total], r13
     
     
     xor rcx, rcx
