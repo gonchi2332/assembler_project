@@ -1,6 +1,14 @@
 section .text
 global concatenar_cad
 
+; Entradas:
+;   RSI = puntero a texto plano
+;   RDI = puntero a texto a concatenar
+;   RCX = longitud del texto
+;   R8  = longitud de texto a concatenar
+; Salida:
+;   El texto cifrado [RDI]
+
 concatenar_cad:
     mov rbp, rsp; for correct debugging
     push rdi

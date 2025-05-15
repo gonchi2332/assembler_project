@@ -5,18 +5,19 @@
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\llaveDos.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\rc4Reu.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\hex_a_ascii.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\sum_hex.asm"
 
 extern GetStdHandle
 extern WriteFile
 extern ExitProcess
 
 section .data
-    numero_autorizacion db "29040011007", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    numero_factura      db "1503", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    nit_cliente         db "4189179011", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    fecha_transaccion   db "20070702", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    monto_transaccion   db "2500", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    llave_dosificacion  db "9rCB7Sv4X29d)5k7N%3ab89p-3(5[A", 0, 0, 0, 0, 0, 0
+    numero_autorizacion db "79040011859", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    numero_factura      db "152", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    nit_cliente         db "1026469026", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    fecha_transaccion   db "20070728", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    monto_transaccion   db "135", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    llave_dosificacion  db "A3Fs4s$)2cvD(eY667A5C4A2rsdf53kw9654E2B23s24df35F5", 0, 0, 0, 0, 0, 0
     tam_llave equ $ - llave_dosificacion - 1
     sum_dig times 18 db 0
     resultado db 0         ; aquí guardaremos AL como ASCII
@@ -30,12 +31,12 @@ section .bss
     cad_concatenada    resb 116
     cypher1 resb 116
     cad_cypher1 resb 233
-    sum1 resb 1
-    sum2 resb 1
-    sum3 resb 1
-    sum4 resb 1
-    sum5 resb 1
-    sum_total resb 1
+    sum1 resb 2
+    sum2 resb 2
+    sum3 resb 2
+    sum4 resb 2
+    sum5 resb 2
+    sum_total resb 4
     base resb 5
     cypher2 resb 10
     monto_completo    resb 12
@@ -110,7 +111,10 @@ main:
         lea rsi, [nit_cliente]
         jmp .continuar
     .fecha:
+        push rcx
         lea rsi, [fecha_transaccion]
+        call tamcad
+        pop rcx
         jmp .continuar
     .monto:
         lea rsi, [monto_transaccion]
@@ -122,36 +126,50 @@ main:
         jl .particionar_loop
     
     mov byte [indice_llave], 0
+    
     lea rsi, [numero_autorizacion]
     call tamcad
     mov r8, rcx
     lea rsi, [cad_concatenada]
     lea rdi, [numero_autorizacion] 
     call concatenar_cad
+    call tamcad
+    
+    mov byte [indice_llave], 0
     lea rsi, [numero_factura]
     call tamcad
     mov r8, rcx
     lea rsi, [cad_concatenada]
     lea rdi, [numero_factura] 
     call concatenar_cad
+    call tamcad
+    
+    mov byte [indice_llave], 0
     lea rsi, [nit_cliente]
     call tamcad
     mov r8, rcx
     lea rsi, [cad_concatenada]
     lea rdi, [nit_cliente] 
     call concatenar_cad
+    call tamcad
+    
+    mov byte [indice_llave], 0
     lea rsi, [fecha_transaccion]
     call tamcad
     mov r8, rcx
     lea rsi, [cad_concatenada]
     lea rdi, [fecha_transaccion] 
     call concatenar_cad
+    call tamcad
+    
+    mov byte [indice_llave], 0
     lea rsi, [monto_transaccion]
     call tamcad
     mov r8, rcx
     lea rsi, [cad_concatenada]
     lea rdi, [monto_transaccion] 
     call concatenar_cad
+    call tamcad
     
     xor r8, r8
     mov r8, 5
@@ -170,6 +188,30 @@ main:
     lea rdi, [cad_cypher1]
     xor r11, r11
     call hex_a_ascii
+    
+    xor rax, rax
+    lea rsi, [cad_cypher1]
+    call tamcad
+    call sum_hex
+    mov [sum1], r10
+    add [sum_total], r10
+    inc rax
+    call sum_hex 
+    mov [sum2], r10
+    add [sum_total], r10
+    inc rax
+    call sum_hex 
+    mov [sum3], r10
+    add [sum_total], r10
+    inc rax
+    call sum_hex 
+    mov [sum4], r10
+    add [sum_total], r10
+    inc rax
+    call sum_hex 
+    mov [sum5], r10
+    add [sum_total], r10
+    
     
     xor rcx, rcx
     call ExitProcess  
