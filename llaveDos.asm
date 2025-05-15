@@ -7,7 +7,6 @@ concatenar_cad:
     push rsi
     push rcx
     push rdx
-    lea rdi, [llave_dosificacion]
     movzx rdx, byte [indice_llave]
     add rdi, rdx
     call tamcad
@@ -24,7 +23,7 @@ concatenar_cad:
 
 .terminado:
     movzx rax, byte [indice_llave]
-    add rax, r8               ; usa r8b porque r8 = 64 bits
+    add rax, r8
     mov [indice_llave], rax
 
     pop rdx

@@ -3,6 +3,7 @@
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\sum_cad.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\int_a_cad.asm"
 %include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\llaveDos.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\rc4Reu.asm"
 
 extern GetStdHandle
 extern WriteFile
@@ -15,6 +16,7 @@ section .data
     fecha_transaccion   db "20070702", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     monto_transaccion   db "2500", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     llave_dosificacion  db "9rCB7Sv4X29d)5k7N%3ab89p-3(5[A", 0, 0, 0, 0, 0, 0
+    tam_llave equ $ - llave_dosificacion - 1
     sum_dig times 18 db 0
     resultado db 0         ; aquí guardaremos AL como ASCII
     escrito dq 0
@@ -25,7 +27,7 @@ section .bss
     cinco_verhoeff resb 5
     inc_cinco_verhoeff resb 5
     cad_concatenada    resb 116
-    cypher1 resb 232
+    cypher1 resb 116
     sum1 resb 1
     sum2 resb 1
     sum3 resb 1
@@ -82,7 +84,7 @@ main:
         jne .cinco_ver
 
     xor rcx, rcx
-    
+    lea rdi, [llave_dosificacion]
     .particionar_loop:
         movzx r8, byte [inc_cinco_verhoeff + rcx]
     
@@ -116,6 +118,45 @@ main:
         inc rcx
         cmp rcx, 5
         jl .particionar_loop
+    
+    mov byte [indice_llave], 0
+    lea rsi, [numero_autorizacion]
+    call tamcad
+    mov r8, rcx
+    lea rsi, [cad_concatenada]
+    lea rdi, [numero_autorizacion] 
+    call concatenar_cad
+    lea rsi, [numero_factura]
+    call tamcad
+    mov r8, rcx
+    lea rdi, [numero_factura] 
+    call concatenar_cad
+    lea rsi, [nit_cliente]
+    call tamcad
+    mov r8, rcx
+    lea rdi, [nit_cliente] 
+    call concatenar_cad
+    lea rsi, [fecha_transaccion]
+    call tamcad
+    mov r8, rcx
+    lea rdi, [fecha_transaccion] 
+    call concatenar_cad
+    lea rsi, [monto_transaccion]
+    call tamcad
+    mov r8, rcx
+    lea rdi, [monto_transaccion] 
+    call concatenar_cad
+    
+    xor r8, r8
+    mov r8, 5
+    mov byte [indice_llave], 0
+    lea rsi, [llave_dosificacion]
+    lea rdi, [cinco_verhoeff]   
+    call concatenar_cad 
+
+    lea rsi, [cad_concatenada]
+    lea rdi, [cypher1]  
+    call encripcion_rc4
 
     xor rcx, rcx
     call ExitProcess  
