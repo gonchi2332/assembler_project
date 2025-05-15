@@ -5,7 +5,8 @@ sum_cad:
     xor rbx, rbx
     xor r11, r11
     mov r11, 1
-    push rcx
+    call tamcad
+    dec rcx
     xor r9, r9
     dec r9
 .loop:
@@ -24,5 +25,4 @@ sum_cad:
     jmp .loop
 .termino:
     add r13, rbx
-    pop rcx
     ret

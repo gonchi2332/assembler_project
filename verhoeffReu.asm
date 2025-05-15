@@ -56,6 +56,7 @@ verhoeff:
     jmp .fin_cad
 
 .inicio:
+    push rcx
     dec rcx
     xor r9, r9
     dec r9
@@ -83,6 +84,9 @@ verhoeff:
 
 .termino:
     movzx rax, byte [r12 + rbx]
+    pop rcx
+    add al, '0'
+    mov [rsi + rcx], al
     ; Resultado final en AL
 
     pop r9

@@ -1,39 +1,31 @@
 section .text
-global cortar_y_concatenar
+global concatenar_cad
 
-cortar_y_concatenar:
+concatenar_cad:
+    mov rbp, rsp; for correct debugging
     push rdi
     push rsi
     push rcx
     push rdx
-
     lea rdi, [llave_dosificacion]
     movzx rdx, byte [indice_llave]
     add rdi, rdx
-    mov rcx, 0
-.find_end:
-    mov al, [rsi + rcx]
-    cmp al, 0
-    je .copy_fragment
-    inc rcx
-    jmp .find_end
+    call tamcad
 
-.copy_fragment:
-    mov rdx, 0
-.loop_copy:
+    xor rdx, rdx
+.loop_copia:
     cmp rdx, r8
-    je .finish
-    mov al, [rdi + rdx]
+    je .terminado
+    movzx rax, byte [rdi + rdx]
     mov [rsi + rcx], al
     inc rcx
     inc rdx
-    jmp .loop_copy
+    jmp .loop_copia
 
-.finish:
-    mov byte [rsi + rcx], 0
+.terminado:
     movzx rax, byte [indice_llave]
-    add al, r8b               ; ⬅️ usa r8b porque r8 = 64 bits
-    mov [indice_llave], al
+    add rax, r8               ; usa r8b porque r8 = 64 bits
+    mov [indice_llave], rax
 
     pop rdx
     pop rcx

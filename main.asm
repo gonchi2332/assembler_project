@@ -1,8 +1,8 @@
-%include "D:\Universidad\Taller bajo nivel de programacion\PrimerParcial2025\assembler_project\verhoeffReu.asm"
-%include "D:\Universidad\Taller bajo nivel de programacion\PrimerParcial2025\assembler_project\tamcad.asm"
-%include "D:\Universidad\Taller bajo nivel de programacion\PrimerParcial2025\assembler_project\sum_cad.asm"
-%include "D:\Universidad\Taller bajo nivel de programacion\PrimerParcial2025\assembler_project\int_a_cad.asm"
-%include "D:\Universidad\Taller bajo nivel de programacion\PrimerParcial2025\assembler_project\llaveDos.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\verhoeffReu.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\tamcad.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\sum_cad.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\int_a_cad.asm"
+%include "C:\Users\israe\Documents\UMSS\Assembly\assembler_project\llaveDos.asm"
 
 extern GetStdHandle
 extern WriteFile
@@ -14,121 +14,85 @@ section .data
     nit_cliente         db "4189179011", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     fecha_transaccion   db "20070702", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     monto_transaccion   db "2500", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    llave_dosificacion  db "9rCB7Sv4X29d)5k7N%3ab89p-3(5[A", 0 
+    llave_dosificacion  db "9rCB7Sv4X29d)5k7N%3ab89p-3(5[A", 0, 0, 0, 0, 0, 0
     sum_dig times 18 db 0
     resultado db 0         ; aquí guardaremos AL como ASCII
     escrito dq 0
-    handle_stdout dq 0
+    indice_llave db 0
     mensaje db "Resultado final", 10, 0
 
 section .bss
     cinco_verhoeff resb 5
-    fecha_completa    resb 12
+    inc_cinco_verhoeff resb 5
+    cad_concatenada    resb 116
+    cypher1 resb 232
+    sum1 resb 1
+    sum2 resb 1
+    sum3 resb 1
+    sum4 resb 1
+    sum5 resb 1
+    sum_total resb 1
+    base resb 5
+    cypher2 resb 10
     monto_completo    resb 12
     fragmento resb 32
-    indice_llave resb 1
 
 section .text
 global main
 main:
-    mov rbp, rsp; for correct debugging
-    mov rcx, -11
-    call GetStdHandle
-    mov [handle_stdout], rax
     
     mov rbp, rsp ; debug
     sub rsp, 40    
     xor r13, r13
-    lea r14, [sum_dig]
     lea rsi, [numero_factura]
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call sum_cad
     
     lea rsi, [nit_cliente]
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call sum_cad
     
     lea rsi, [fecha_transaccion]
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call sum_cad
     
     lea rsi, [monto_transaccion]
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
     call verhoeff
-    call tamcad
-    add al, '0'
-    mov [rsi + rcx], al
-    
     call sum_cad
+    
+    ; en r13 esta la suma de las cad en modo int, a continuacion lo convertimos
+    ; a una cadena para poder sacar su verhoeff 
+    lea r14, [sum_dig]
     call int_a_cad
+    
     lea rsi, [sum_dig]
-    call verhoeff
-    call tamcad
-    mov [cinco_verhoeff], al
-    add al, '0'
-    mov [rsi + rcx], al
-    call verhoeff
-    call tamcad
-    mov [cinco_verhoeff + 1], al
-    add al, '0'
-    mov [rsi + rcx], al
-    call verhoeff
-    call tamcad
-    mov [cinco_verhoeff + 2], al
-    add al, '0'
-    mov [rsi + rcx], al
-    call verhoeff
-    call tamcad
-    mov [cinco_verhoeff + 3], al
-    add al, '0'
-    mov [rsi + rcx], al
-    call verhoeff
-    call tamcad
-    mov [cinco_verhoeff +4], al
-    add al, '0'
-    mov [rsi + rcx], al
+    xor rcx, rcx
+    .cinco_ver:
+        call verhoeff
+        mov [cinco_verhoeff + rcx], al
+        sub rax, '0'
+        inc rax
+        mov [inc_cinco_verhoeff + rcx], al
+        inc rcx
+        cmp rcx, 5
+        jne .cinco_ver
 
-
-    ; Inicializar índice de corte de la llave
-    mov byte [indice_llave], 0
-    mov ecx, 0
+    xor rcx, rcx
     
     .particionar_loop:
-        movzx r8, byte [cinco_verhoeff + rcx]
-        sub r8, '0'
-        inc r8  ;
+        movzx r8, byte [inc_cinco_verhoeff + rcx]
     
-        cmp ecx, 0
+        cmp rcx, 0
         je .autorizacion
-        cmp ecx, 1
+        cmp rcx, 1
         je .factura
-        cmp ecx, 2
+        cmp rcx, 2
         je .nit
-        cmp ecx, 3
+        cmp rcx, 3
         je .fecha
         jmp .monto
     
@@ -148,12 +112,12 @@ main:
         lea rsi, [monto_transaccion]
     
     .continuar:
-        call cortar_y_concatenar
-        inc ecx
-        cmp ecx, 5
+        call concatenar_cad
+        inc rcx
+        cmp rcx, 5
         jl .particionar_loop
 
-    xor ecx, ecx
+    xor rcx, rcx
     call ExitProcess  
 
       
@@ -167,7 +131,7 @@ imprimir_string:
     push r8
     push r9
 
-    mov rcx, [handle_stdout]
+    mov rcx, [resultado]
     mov r8, rdx               ; Número de bytes a escribir
     lea r9, [escrito]         ; Dirección para almacenar bytes escritos
     xor rax, rax              ; LPOVERLAPPED = NULL
